@@ -25,15 +25,16 @@ import java.util.List;
  * Created by it_mb on 23.11.2016.
  */
 public class Runner {
-
+    private static HttpTransport HTTP_TRANSPORT;
+    private static JsonFactory JSON_FACTORY;
+    private static GoogleCredential credential;
 
     public static void main(String[] args) throws Throwable,IOException {
-        HttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        JsonFactory JSON_FACTORY =                JacksonFactory.getDefaultInstance();
-
-        InputStream resourceAsStream = Runner.class.getClassLoader().getResourceAsStream("ProjectSheets-afcedd1485e6.json");
-        GoogleCredential credential = GoogleCredential.fromStream(resourceAsStream).createScoped(Collections.singleton(SheetsScopes.SPREADSHEETS));
+        HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        JSON_FACTORY = JacksonFactory.getDefaultInstance();
+        credential = getCredential();
         Sheets sheets = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName("SpreadSheet").build();
+        
         String spreadsheetId = "1ahZG47v1rfKDPX7ef26vwttlMRVp0OSbYkM1tikzt3w";
         String range = "A1:A2";
         ValueRange response = sheets.spreadsheets().values()
@@ -44,7 +45,7 @@ public class Runner {
         if (values == null || values.size() == 0) {
             System.out.println("No data found.");
         } else {
-            System.out.println("Name, Major");
+
             for (List row : values) {
                 // Print columns A and E, which correspond to indices 0 and 4.
                 System.out.printf("%s \n", row.get(0));
@@ -52,5 +53,9 @@ public class Runner {
         }
 
 
+    }
+    private static GoogleCredential getCredential() throws Throwable{
+        InputStream resourceAsStream = Runner.class.getClassLoader().getResourceAsStream("bitirix-project-cab4f917a7b8.json");
+        return GoogleCredential.fromStream(resourceAsStream).createScoped(Collections.singleton(SheetsScopes.SPREADSHEETS));
     }
 }
